@@ -1,14 +1,14 @@
 <?php
 
+use App\Http\Controllers\ThreadController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('landingPage');
-})->name('/');
+Route::get('/', [ThreadController::class, 'index'])->name('home');
+Route::get('/search', [ThreadController::class, 'search'])->name('search');
 
-Route::get('/threads', function () {
-    return view('threadsPage');
-})->name('/threads');
+Route::get('/threads', [ThreadController::class, 'sortByDate'])->name('threads');
+
+Route::get('/search2', [ThreadController::class, 'searchSortByDate'])->name('searchDateSorted');
 
 Route::get('/userThreads', function () {
     return view('userThreadsPage');

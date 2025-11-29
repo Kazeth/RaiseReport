@@ -14,7 +14,36 @@ class ThreadController extends Controller
     public function index()
     {
         //
+        $threads = Thread::orderBy('threadUpvote', 'desc')->get();
+        return view('landingPage', compact('threads'));
     }
+
+    public function search(Request $request)
+    {
+        $threads = Thread::where('threadName', 'like', "%{$request->search}%")
+            ->orderBy('threadUpvote', 'desc')
+            ->get();
+
+        return response()->json($threads);
+    }
+
+    public function sortByDate(Request $request)
+    {
+        $threads = Thread::orderBy('created_at', 'desc')->get();
+
+        return view('threadsPage', compact('threads'));
+    }
+
+    public function searchSortByDate(Request $request)
+    {
+        $threads = Thread::where('threadName', 'like', "%{$request->search}%")
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($threads);
+    }
+
+
 
     /**
      * Show the form for creating a new resource.
