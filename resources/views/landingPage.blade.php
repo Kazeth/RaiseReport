@@ -12,16 +12,31 @@
                 <input type="text" id="searchBox" class="form-control" placeholder="Search threads...">
                 <div id="threadContainer">
                     @foreach ($threads as $thread)
-                        <div class="card row" style="padding: 1vw; margin: 2vw;">
-                            <div class="d-flex justify-content-between mb-3 mt-2">
-                                <div class="col-4 fw-bold">{{ $thread->threadName }}</div>
-                                <div class="col-4">{{ $thread->threadContent }}</div>
+                        <a href="{{ route('detail', $thread->id) }}" style="text-decoration:none; color:inherit;">
+                            <div class="card row" style="padding: 1vw; margin: 2vw;">
+
+                                {{-- Thread Name (full width) --}}
+                                <div class="fw-bold mb-2" style="font-size: 1.2rem;">
+                                    {{ $thread->threadName }}
+                                </div>
+
+                                {{-- Thread Content (full width, panjang) --}}
+                                <div class="mb-3" style="text-align: justify;">
+                                    {{ $thread->threadContent }}
+                                </div>
+
+                                {{-- Info Section --}}
+                                <div class="d-flex justify-content-between mb-2">
+                                    <div>Upvote : {{ $thread->threadUpvote }}</div>
+                                    <div>Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
+                                </div>
+                                <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
+                                        style="max-width: 120px;">
+                                        @csrf
+                                        <button class="btn btn-success w-100">Upvote</button>
+                                    </form>
                             </div>
-                            <div class="justify-content-between ">
-                                <div class="col">Upvote : {{ $thread->threadUpvote }}</div>
-                                <div class="col">Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
-                            </div>
-                        </div>
+                        </a>
                     @endforeach
                 </div>
 

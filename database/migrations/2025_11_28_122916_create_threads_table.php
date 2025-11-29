@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('threads', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('userId');
-            $table->string('threadName');
-            $table->string('threadContent');
+            $table->mediumText('threadName');
+            $table->longText('threadContent');
             $table->integer('threadUpvote');
             $table->timestamps();
 

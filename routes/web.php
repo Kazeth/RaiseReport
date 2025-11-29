@@ -10,6 +10,14 @@ Route::get('/threads', [ThreadController::class, 'sortByDate'])->name('threads')
 
 Route::get('/search2', [ThreadController::class, 'searchSortByDate'])->name('searchDateSorted');
 
+Route::get('/thread/{id}', [ThreadController::class, 'show'])->name('detail');
+
+Route::get('/thread/{id}/upvote', [ThreadController::class, 'upvote'])->name('upvote');
+
+Route::post('/thread/{id}/upvote', [ThreadController::class, 'upvote'])->name('upvote');
+
+
+
 Route::get('/userThreads', function () {
     return view('userThreadsPage');
 })->name('/userThreads');

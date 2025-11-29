@@ -43,7 +43,20 @@ class ThreadController extends Controller
         return response()->json($threads);
     }
 
+    public function show($id)
+    {
+        $thread = Thread::findOrFail($id);
+        return view('threadDetailPage', compact('thread'));
+    }
 
+    public function upvote($id)
+    {
+        $thread = Thread::findOrFail($id);
+        $thread->threadUpvote += 1;
+        $thread->save();
+
+        return redirect()->back()->with('success', 'Upvoted!');
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -61,13 +74,6 @@ class ThreadController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Thread $thread)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
