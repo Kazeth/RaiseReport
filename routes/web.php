@@ -17,9 +17,6 @@ use App\Http\Controllers\AuthController;
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('guest')->group(function () {
-
-
-
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register', [AuthController::class, 'register_store'])->name('register.store');
 
@@ -32,22 +29,26 @@ Route::middleware('user')->group(function () {
     Route::get('/thread/{id}/upvote', [ThreadController::class, 'upvote'])->name('upvote');
     Route::post('/thread/{id}/upvote', [ThreadController::class, 'upvote'])->name('upvote');
 
-    Route::get('/userThreads', function () {
-        return view('userThreadsPage');
-    })->name('/userThreads');
+    Route::get('/userThreads', [ThreadController::class, 'userIndex'])->name('userThreads');
 
     Route::get('/createThread', function () {
         return view('createThreadPage');
-    })->name('/createThread');
+    })->name('createThread');
 
     Route::get('/editThread', function () {
         return view('editThreadPage');
-    })->name('/editThread');
+    })->name('editThread');
 
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
     Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
 });
 
 Route::middleware('admin')->group(function () {
-    
+    Route::get('/manageThread', function () {
+        return view('manageThreadPage');
+    })->name('manageThread');
+
+    Route::get('/threadsRequests', function () {
+        return view('threadsRequestsPage');
+    })->name('threadsRequests');
 });

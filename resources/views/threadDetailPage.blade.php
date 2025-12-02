@@ -1,6 +1,6 @@
 @extends('app')
 
-@section('title', 'RaiseReport - Threads')
+@section('title', 'RaiseReport - Thread Detail')
 
 @section('content')
 

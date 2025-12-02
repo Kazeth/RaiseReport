@@ -40,10 +40,17 @@ class ThreadFactory extends Factory
             'Makassar'
         ];
 
+        $statuses = [
+            'Rejected',
+            'Pending',
+            'Approved'
+        ];
+
         // generate kejadian + lokasi
         $incident = $this->faker->randomElement($incidents);
         $extraWords = $this->faker->words(rand(1, 3), true);
         $location = $this->faker->randomElement($locations);
+        $status = $this->faker->randomElement($statuses);
 
         // threadName: Contoh → "Perundungan siswa kelas 8 di Bandung"
         $threadName = ucfirst($incident . " di $location");
@@ -62,11 +69,14 @@ class ThreadFactory extends Factory
 
         $threadContent = $templates[array_rand($templates)];
 
+
         return [
-            'userId' => User::factory(),
+            'userId' => User::inRandomOrder()->first()->id,
             'threadName' => $threadName,
             'threadContent' => $threadContent,
-            'threadUpvote' => $this->faker->numberBetween(0, 20),
+            'threadStatus' => $status,
+            'threadUpvote' => ($status == 'Approved' ? $this->faker->numberBetween(0, 20) : 0),
+
         ];
     }
 }

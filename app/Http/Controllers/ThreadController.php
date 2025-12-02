@@ -14,13 +14,13 @@ class ThreadController extends Controller
     public function index()
     {
         //
-        $threads = Thread::orderBy('threadUpvote', 'desc')->get();
+        $threads = Thread::where('threadStatus', 'like', "%approved%")->orderBy('threadUpvote', 'desc')->get();
         return view('landingPage', compact('threads'));
     }
 
     public function search(Request $request)
     {
-        $threads = Thread::where('threadName', 'like', "%{$request->search}%")
+        $threads = Thread::where('threadName', 'like', "%{$request->search}%", "&&", 'threadStatus', 'like', "%approved%")
             ->orderBy('threadUpvote', 'desc')
             ->get();
 
@@ -29,14 +29,14 @@ class ThreadController extends Controller
 
     public function sortByDate(Request $request)
     {
-        $threads = Thread::orderBy('created_at', 'desc')->get();
+        $threads = Thread::where('threadStatus', 'like', "%approved%")->orderBy('created_at', 'desc')->get();
 
         return view('threadsPage', compact('threads'));
     }
 
     public function searchSortByDate(Request $request)
     {
-        $threads = Thread::where('threadName', 'like', "%{$request->search}%")
+        $threads = Thread::where('threadName', 'like', "%{$request->search}%", "&&", 'threadStatus', 'like', "%approved%")
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -47,6 +47,16 @@ class ThreadController extends Controller
     {
         $thread = Thread::findOrFail($id);
         return view('threadDetailPage', compact('thread'));
+    }
+
+    public function userIndex()
+    {
+        $userId = auth()->id();
+        $threads = Thread::where('userId', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('userThreadsPage', compact('threads'));
     }
 
     public function upvote($id)

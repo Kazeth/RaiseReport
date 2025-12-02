@@ -17,6 +17,8 @@ return new class extends Migration
             $table->mediumText('threadName');
             $table->longText('threadContent');
             $table->integer('threadUpvote');
+            $table->mediumText('threadStatus');
+
             $table->timestamps();
 
             $table->foreign('userId')->references('id')->on('users');

@@ -4,11 +4,24 @@
             <a href="{{ route('home') }}">RaiseReport</a>
         </div>
         <div class="col-6 d-flex justify-content-start">
+            {{-- guest --}}
             <a href="{{ route('threads') }}" class="mx-3">Threads</a>
-            <a href='{{ route('/userThreads') }}' class="mx-3">My Threads </a>
-            <a href='{{ route('/createThread') }}' class="mx-3">Create Thread</a>
-            <a href='{{ route('/editThread') }}' class="mx-3">Edit Thread</a>
-            <a href='{{ route('profile') }}' class="mx-3">Profile</a>
+
+            @auth
+                {{-- user --}}
+                @if (auth()->user()->role === 'user')
+                    <a href='{{ route('userThreads') }}' class="mx-3">My Threads </a>
+                    <a href='{{ route('createThread') }}' class="mx-3">Create Thread</a>
+                    <a href='{{ route('editThread') }}' class="mx-3">Edit Thread</a>
+                    <a href='{{ route('profile') }}' class="mx-3">Profile</a>
+                @endif
+
+                {{-- admin --}}
+                @if (auth()->user()->role === 'admin')
+                    <a href='{{ route('manageThread') }}' class="mx-3">Manage Threads</a>
+                    <a href='{{ route('threadsRequests') }}' class="mx-3">Threads Requests</a>
+                @endif
+            @endauth
         </div>
         <div class="col-4 d-flex justify-content-end align-items-center">
 

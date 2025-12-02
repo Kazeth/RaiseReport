@@ -16,6 +16,7 @@ class Thread extends Model
         'threadName',
         'threadContent',
         'threadUpvote',
+        'threadStatus'
     ];
 
     public function files(): HasMany

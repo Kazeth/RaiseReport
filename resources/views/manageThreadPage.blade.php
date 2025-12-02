@@ -1,78 +1,43 @@
 @extends('app')
 
-@section('title', 'RaiseReport - My Threads')
+@section('title', 'RaiseReport - Manage Threads')
 
 @section('content')
 
     <body>
         <div class="col d-flex justify-content-center">
             <div class="row container-sm justify-content-center" style="width: 50vw;">
-                <h1 class="d-flex justify-content-center">My Threads</h1>
+                <h1 class="d-flex justify-content-center">Latest Threads</h1>
 
                 <input type="text" id="searchBox" class="form-control" placeholder="Search threads...">
                 <div id="threadContainer">
                     @foreach ($threads as $thread)
-                        @php
-                            // Warna badge
-                            $badgeColor = match ($thread->threadStatus) {
-                                'Pending' => '#d39e00',
-                                'Rejected' => '#cc0000',
-                                default => '#28a745',
-                            };
-
-                            // Warna background card
-                            $cardBg = match ($thread->threadStatus) {
-                                'Pending' => '#fff7d1', // kuning muda
-                                'Rejected' => '#ffe1e1', // merah muda
-                                default => '#ffffff', // approved putih
-                            };
-                        @endphp
-
                         <a href="{{ route('detail', $thread->id) }}" style="text-decoration:none; color:inherit;">
-                            <div class="card row" style="padding: 1vw; margin: 2vw; background-color: {{ $cardBg }};">
+                            <div class="card row" style="padding: 1vw; margin: 2vw;">
 
-                                {{-- Thread Name + Status Badge --}}
-                                <div class="fw-bold mb-2 d-flex align-items-center" style="font-size: 1.2rem; gap: 10px;">
+                                {{-- Thread Name (full width) --}}
+                                <div class="fw-bold mb-2" style="font-size: 1.2rem;">
                                     {{ $thread->threadName }}
-
-                                    <span
-                                        style="
-                    background-color: {{ $badgeColor }};
-                    color: white;
-                    padding: 4px 10px;
-                    border-radius: 6px;
-                    font-size: 0.8rem;
-                ">
-                                        {{ $thread->threadStatus }}
-                                    </span>
                                 </div>
 
-                                {{-- Thread Content --}}
+                                {{-- Thread Content (full width, panjang) --}}
                                 <div class="mb-3" style="text-align: justify;">
                                     {{ $thread->threadContent }}
                                 </div>
 
-                                {{-- Info --}}
+                                {{-- Info Section --}}
                                 <div class="d-flex justify-content-between mb-2">
                                     <div>Upvote : {{ $thread->threadUpvote }}</div>
                                     <div>Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
                                 </div>
-
-                                {{-- Only approved can be upvoted --}}
-                                @if ($thread->threadStatus === 'Approved')
-                                    <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
-                                        style="max-width: 120px;">
-                                        @csrf
-                                        <button class="btn btn-success w-100">Upvote</button>
-                                    </form>
-                                @endif
-
+                                <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
+                                    style="max-width: 120px;">
+                                    @csrf
+                                    <button class="btn btn-success w-100">Upvote</button>
+                                </form>
                             </div>
                         </a>
                     @endforeach
-
-
-
                 </div>
 
             </div>

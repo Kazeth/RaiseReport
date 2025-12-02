@@ -5,7 +5,23 @@
 @section('content')
 
     <body>
+        @if (!Auth::check() || auth()->user()->role !== 'admin')
+            <a href="{{ route('createThread') }}" class="btn btn-primary"
+                style="
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1050;
+            border-radius: 50px;
+            padding: 12px 22px;
+        ">
+                + New Thread
+            </a>
+        @endif
+
+
         <div class="col d-flex justify-content-center">
+
             <div class="row container-sm justify-content-center" style="width: 50vw;">
                 <h1 class="d-flex justify-content-center">Trendings</h1>
 
@@ -31,10 +47,10 @@
                                     <div>Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
                                 </div>
                                 <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
-                                        style="max-width: 120px;">
-                                        @csrf
-                                        <button class="btn btn-success w-100">Upvote</button>
-                                    </form>
+                                    style="max-width: 120px;">
+                                    @csrf
+                                    <button class="btn btn-success w-100">Upvote</button>
+                                </form>
                             </div>
                         </a>
                     @endforeach
