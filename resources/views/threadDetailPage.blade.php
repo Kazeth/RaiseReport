@@ -42,11 +42,7 @@
                         <button class="btn btn-success w-100">Upvote 👍</button>
                     </form>
                 </div>
-
-
-
             </div>
-
         </div>
     </body>
 @endsection
