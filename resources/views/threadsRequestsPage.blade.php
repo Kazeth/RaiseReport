@@ -27,7 +27,7 @@
 
                                 {{-- Info Section --}}
                                 <div class="d-flex justify-content-between mb-2">
-                                    <div>Upvote : {{ $thread->threadUpvote }}</div>
+                                    <div>Upvote : {{ $thread->upvotes_count  }}</div>
                                     <div>Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
                                 </div>
                                 <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"

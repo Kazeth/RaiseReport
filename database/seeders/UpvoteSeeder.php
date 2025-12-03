@@ -2,24 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\Thread;
 use App\Models\Upvote;
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class UpvoteSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      */
     public function run(): void
     {
-        User::factory(50)->create();
-        Thread::factory(50)->create();
-        Upvote::factory(200)
+        //
+        Upvote::factory(20)
             ->make()
             ->unique(fn($u) => $u->user_id . '-' . $u->thread_id)
             ->each(fn($u) => $u->save());

@@ -18,6 +18,25 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Jalankan di semua page
+        document.addEventListener('DOMContentLoaded', function() {
+            const key = 'scroll-position-' + location.pathname;
+
+            // Restore scroll posisi dari sessionStorage
+            const scrollPos = sessionStorage.getItem(key);
+            if (scrollPos) {
+                window.scrollTo(0, parseInt(scrollPos));
+                sessionStorage.removeItem(key);
+            }
+
+            // Simpan scroll sebelum pindah halaman
+            window.addEventListener('beforeunload', function() {
+                sessionStorage.setItem(key, window.scrollY);
+            });
+        });
+    </script>
+
 </body>
 
 </html>

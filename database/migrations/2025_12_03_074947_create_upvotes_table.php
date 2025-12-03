@@ -11,16 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('threads', function (Blueprint $table) {
+        Schema::create('upvotes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('userId');
-            $table->mediumText('threadName');
-            $table->longText('threadContent');
-            $table->mediumText('threadStatus');
-
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('thread_id')->constrained()->onDelete('cascade');
             $table->timestamps();
 
-            $table->foreign('userId')->references('id')->on('users');
+            $table->unique(['user_id', 'thread_id']);
         });
     }
 
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('threads');
+        Schema::dropIfExists('upvotes');
     }
 };

@@ -29,8 +29,8 @@ class Thread extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function upvoters():HasMany
+    public function upvotes():HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(Upvote::class);
     }
 }

@@ -8,7 +8,8 @@
         <div class="container mt-5" style="max-width: 700px;">
 
             <!-- Back button -->
-            <a href="{{ route('threads') }}" class="btn btn-secondary mb-3">← Back</a>
+            <a href="{{ url()->previous() }}" class="btn btn-secondary mb-3">← Back</a>
+
 
             <!-- Thread Card -->
             <div class="card shadow-sm p-4">
@@ -32,15 +33,28 @@
                         <span class="fw-bold me-2">Upvotes:</span>
 
                         <span class="badge bg-primary" style="font-size: 1rem;">
-                            {{ $thread->threadUpvote }}
+                            {{ $thread->upvotes_count }}
                         </span>
                     </div>
+                    @if (auth()->check())
+                        @if ($thread->upvotes->contains('user_id', auth()->id()))
+                            <button class="btn btn-secondary w-100 mt-2" disabled>✓ Upvoted</button>
+                        @else
+                            <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
+                                style="max-width: 120px;">
+                                @csrf
+                                <button class="btn btn-success w-100">Upvote</button>
+                            </form>
+                        @endif
+                    @else
+                        <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
+                            style="max-width: 120px;">
+                            @csrf
+                            <button class="btn btn-success w-100">Upvote</button>
+                        </form>
+                    @endif
 
-                    <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
-                        style="max-width: 120px;">
-                        @csrf
-                        <button class="btn btn-success w-100">Upvote 👍</button>
-                    </form>
+
                 </div>
             </div>
         </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Thread;
 use App\Http\Controllers\Controller;
+use App\Models\Upvote;
 use Illuminate\Http\Request;
 
 class ThreadController extends Controller
@@ -14,14 +15,23 @@ class ThreadController extends Controller
     public function index()
     {
         //
-        $threads = Thread::where('threadStatus', 'like', "%approved%")->orderBy('threadUpvote', 'desc')->get();
+        $threads = Thread::where('threadStatus', 'like', "%approved%")
+            ->withCount('upvotes')
+            ->with(['upvotes' => function ($q) {
+                $q->where('user_id', auth()->id());
+            }])
+            ->orderBy('upvotes_count', 'desc')->get();
         return view('landingPage', compact('threads'));
     }
 
     public function search(Request $request)
     {
         $threads = Thread::where('threadName', 'like', "%{$request->search}%", "&&", 'threadStatus', 'like', "%approved%")
-            ->orderBy('threadUpvote', 'desc')
+            ->withCount('upvotes')
+            ->with(['upvotes' => function ($q) {
+                $q->where('user_id', auth()->id());
+            }])
+            ->orderBy('upvotes_count', 'desc')
             ->get();
 
         return response()->json($threads);
@@ -29,14 +39,24 @@ class ThreadController extends Controller
 
     public function sortByDate(Request $request)
     {
-        $threads = Thread::where('threadStatus', 'like', "%approved%")->orderBy('created_at', 'desc')->get();
+        $threads = Thread::where('threadStatus', 'like', "%approved%")
+            ->withCount('upvotes')
+            ->with(['upvotes' => function ($q) {
+                $q->where('user_id', auth()->id());
+            }])
+            ->orderBy('created_at', 'desc')->get();
 
         return view('threadsPage', compact('threads'));
     }
 
     public function searchSortByDate(Request $request)
     {
-        $threads = Thread::where('threadName', 'like', "%{$request->search}%", "&&", 'threadStatus', 'like', "%approved%")
+        $threads = Thread::where('threadName', 'like', "%{$request->search}%")
+            ->where('threadStatus', 'like', "%approved%")
+            ->withCount('upvotes')
+            ->with(['upvotes' => function ($q) {
+                $q->where('user_id', auth()->id());
+            }])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -45,7 +65,7 @@ class ThreadController extends Controller
 
     public function show($id)
     {
-        $thread = Thread::findOrFail($id);
+        $thread = Thread::withCount('upvotes')->findOrFail($id);
         return view('threadDetailPage', compact('thread'));
     }
 
@@ -53,7 +73,10 @@ class ThreadController extends Controller
     {
         $userId = auth()->id();
         $threads = Thread::where('userId', $userId)
-            ->orderBy('created_at', 'desc')
+            ->with(['upvotes' => function ($q) {
+                $q->where('user_id', auth()->id());
+            }])
+            ->orderBy('created_at', 'desc')->withCount('upvotes')
             ->get();
 
         return view('userThreadsPage', compact('threads'));
@@ -61,12 +84,26 @@ class ThreadController extends Controller
 
     public function upvote($id)
     {
-        $thread = Thread::findOrFail($id);
-        $thread->threadUpvote += 1;
-        $thread->save();
+        $userId = auth()->id();
+
+        // Cek apakah user sudah pernah upvote thread ini
+        $hasUpvoted = Upvote::where('user_id', $userId)
+            ->where('thread_id', $id)
+            ->exists();
+
+        if ($hasUpvoted) {
+            return redirect()->back()->with('error', 'You have already upvoted this thread.');
+        }
+
+        // Jika belum, buat upvote baru
+        Upvote::create([
+            'user_id' => $userId,
+            'thread_id' => $id,
+        ]);
 
         return redirect()->back()->with('success', 'Upvoted!');
     }
+
 
     /**
      * Show the form for creating a new resource.

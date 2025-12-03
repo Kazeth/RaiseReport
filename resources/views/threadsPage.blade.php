@@ -27,14 +27,22 @@
 
                                 {{-- Info Section --}}
                                 <div class="d-flex justify-content-between mb-2">
-                                    <div>Upvote : {{ $thread->threadUpvote }}</div>
+                                    <div>Upvote : {{ $thread->upvotes_count }}</div>
                                     <div>Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
                                 </div>
-                                <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
-                                    style="max-width: 120px;">
-                                    @csrf
-                                    <button class="btn btn-success w-100">Upvote</button>
-                                </form>
+                                @if ($thread->upvotes->isNotEmpty())
+                                    {{-- Sudah pernah upvote --}}
+                                    <button class="btn btn-secondary w-100 mt-2" disabled>
+                                        ✓ Upvoted
+                                    </button>
+                                @else
+                                    {{-- Belum pernah upvote --}}
+                                    <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
+                                        style="max-width: 120px;">
+                                        @csrf
+                                        <button class="btn btn-success w-100">Upvote</button>
+                                    </form>
+                                @endif
                             </div>
                         </a>
                     @endforeach
@@ -58,17 +66,36 @@
                         $('#threadContainer').html('');
 
                         data.forEach(thread => {
+                            let isUpvoted = thread.upvotes.length > 0;
+
                             $('#threadContainer').append(`
-                        <div class="card row" style="padding: 1vw; margin: 2vw;">
-                            <div class="d-flex justify-content-between mb-3 mt-2">
-                                <div class="col-4 fw-bold">${thread.threadName}</div>
-                                <div class="col-4">${thread.threadContent}</div>
-                            </div>
-                            <div class="col">Upvote : ${thread.threadUpvote}</div>
-                        </div>
-                    `);
+            <div class="card row" style="padding: 1vw; margin: 2vw;">
+
+                <div class="fw-bold mb-2" style="font-size: 1.2rem;">
+                    ${thread.threadName}
+                </div>
+
+                <div class="mb-3" style="text-align: justify;">
+                    ${thread.threadContent}
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <div>Upvote : ${thread.upvotes_count}</div>
+                    <div>Posted on ${new Date(thread.created_at).toLocaleString()}</div>
+                </div>
+
+                ${isUpvoted
+                    ? `<button class="btn btn-secondary w-100 mt-2" disabled>✓ Upvoted</button>`
+                    : `<form action="/upvote/${thread.id}" method="POST" class="mt-2" style="max-width: 120px;">
+                                            @csrf
+                                            <button class="btn btn-success w-100">Upvote</button>
+                                       </form>`
+                }
+            </div>
+        `);
                         });
                     }
+
                 });
             });
         </script>

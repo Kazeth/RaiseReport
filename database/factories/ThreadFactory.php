@@ -75,8 +75,6 @@ class ThreadFactory extends Factory
             'threadName' => $threadName,
             'threadContent' => $threadContent,
             'threadStatus' => $status,
-            'threadUpvote' => ($status == 'Approved' ? $this->faker->numberBetween(0, 20) : 0),
-
         ];
     }
 }
