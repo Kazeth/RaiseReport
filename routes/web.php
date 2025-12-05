@@ -4,16 +4,19 @@ use App\Http\Controllers\ThreadController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
+    // Landing Page
     Route::get('/', [ThreadController::class, 'index'])->name('home');
+    Route::get('/showIndex', [ThreadController::class, 'showIndex'])->name('showIndex');
 
-    Route::get('/search', [ThreadController::class, 'search'])->name('search');
-
+    // Threads Page
     Route::get('/threads', [ThreadController::class, 'sortByDate'])->name('threads');
 
     Route::get('/search2', [ThreadController::class, 'searchSortByDate'])->name('searchDateSorted');
 
+    // Thread Detail Page
     Route::get('/thread/{id}', [ThreadController::class, 'show'])->name('detail');
 
+    // Utility
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('guest')->group(function () {
@@ -44,11 +47,19 @@ Route::middleware('user')->group(function () {
 });
 
 Route::middleware('admin')->group(function () {
-    Route::get('/manageThread', function () {
-        return view('manageThreadPage');
-    })->name('manageThread');
+    Route::get('/admin/search', [ThreadController::class, 'searchAdmin'])->name('adminSearch');
 
-    Route::get('/threadsRequests', function () {
-        return view('threadsRequestsPage');
-    })->name('threadsRequests');
+    Route::get('/manageThread', [ThreadController::class, 'adminIndex'])->name('manageThread');
+
+    Route::get('/admin/thread/{id}', [ThreadController::class, 'show'])->name('adminDetail');
+
+    Route::post('/manageThread/{id}/approve', [ThreadController::class, 'approve'])->name('approve');
+
+    Route::post('/manageThread/{id}/reject', [ThreadController::class, 'reject'])->name('reject');
+
+    Route::post('/manageThread/{id}/revert', [ThreadController::class, 'revert'])->name('revert');
+
+    Route::get('/showPending', [ThreadController::class, 'showPending'])->name('showPending');
+
+    Route::get('/onHoldThreads', [ThreadController::class, 'showPending'])->name('onHoldThreads');
 });

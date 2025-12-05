@@ -1,4 +1,6 @@
-<div class="row align-items-center justify-content-start  shadow p-3 mb-5 bg-body rounded" style="padding: 1vw">
+<div class="row align-items-center justify-content-start shadow p-3 mb-5 bg-body rounded"
+    style="padding: 1vw; position: sticky; top: 0; z-index: 999; background: white;">
+
     <div class="row" style="margin-left: 1vw">
         <div class="col-2">
             <a href="{{ route('home') }}">RaiseReport</a>
@@ -19,7 +21,7 @@
                 {{-- admin --}}
                 @if (auth()->user()->role === 'admin')
                     <a href='{{ route('manageThread') }}' class="mx-3">Manage Threads</a>
-                    <a href='{{ route('threadsRequests') }}' class="mx-3">Threads Requests</a>
+                    <a href='{{ route('onHoldThreads') }}' class="mx-3">On-Hold Threads</a>
                 @endif
             @endauth
         </div>

@@ -7,70 +7,154 @@
     <body>
         <div class="col d-flex justify-content-center">
             <div class="row container-sm justify-content-center" style="width: 50vw;">
-                <h1 class="d-flex justify-content-center">Latest Threads</h1>
+                <h1 class="d-flex justify-content-center">Manage Threads</h1>
 
-                <input type="text" id="searchBox" class="form-control" placeholder="Search threads...">
+                <div class="d-flex mt-5 p-0" id="statusTabs">
+
+                    <div class="col m-0 text-center py-2 approved-tab active"
+                        style="background-color: transparent; color: #6c757d; cursor: pointer;">
+                        Approved
+                    </div>
+                    <div class="col text-center py-2 rejected-tab"
+                        style="background-color: transparent; color: #6c757d; cursor: pointer;">
+                        Rejected
+                    </div>
+                </div>
+
+                <hr class="" style="border-top:1px solid rgb(0, 0, 0);">
+
                 <div id="threadContainer">
                     @foreach ($threads as $thread)
-                        <a href="{{ route('detail', $thread->id) }}" style="text-decoration:none; color:inherit;">
-                            <div class="card row" style="padding: 1vw; margin: 2vw;">
+                        @php
+                            $cardBg = match ($thread->threadStatus) {
+                                'Pending' => '#fff7d1', // kuning muda
+                                'Rejected' => '#ffe1e1', // merah muda
+                                default => '#00FF0062', // approved hijau muda
+                            };
 
-                                {{-- Thread Name (full width) --}}
-                                <div class="fw-bold mb-2" style="font-size: 1.2rem;">
+                        @endphp
+
+                        <a href="{{ route('adminDetail', $thread->id) }}?from={{ url()->current() }}" style="text-decoration:none; color:inherit;">
+                            <div class="card row thread-card" data-status="{{ strtolower($thread->threadStatus) }}"
+                                style="padding: 1vw; margin: 2vw; background-color: {{ $cardBg }};">
+
+                                <div class="fw-bold mb-2 d-flex align-items-center" style="font-size: 1.2rem; gap: 10px;">
                                     {{ $thread->threadName }}
                                 </div>
 
-                                {{-- Thread Content (full width, panjang) --}}
                                 <div class="mb-3" style="text-align: justify;">
                                     {{ $thread->threadContent }}
                                 </div>
 
-                                {{-- Info Section --}}
+
                                 <div class="d-flex justify-content-between mb-2">
-                                    <div>Upvote : {{ $thread->upvotes_coun }}</div>
+                                    @if ($thread->threadStatus === 'Approved')
+                                        <div>Upvote : {{ $thread->upvotes_count }}
+
+                                        </div>
+                                    @endif
                                     <div>Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
+
                                 </div>
-                                <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
-                                    style="max-width: 120px;">
-                                    @csrf
-                                    <button class="btn btn-success w-100">Upvote</button>
-                                </form>
+                                @if ($thread->threadStatus === 'Approved')
+                                    <div>
+                                        <form action="{{ route('revert', $thread->id) }}" method="POST" class="m-2"
+                                            style="">
+                                            @csrf
+                                            <button class="btn btn-warning"
+                                                style="border:2px solid rgb(255, 255, 255);">Revert to Pending</button>
+                                        </form>
+                                    </div>
+                                @endif
+
                             </div>
                         </a>
                     @endforeach
+
+
+
                 </div>
 
             </div>
         </div>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
         <script>
-            $('#searchBox').on('keyup', function() {
-                let search = $(this).val();
+            $(document).ready(function() {
 
-                $.ajax({
-                    url: "{{ route('searchDateSorted') }}",
-                    type: "GET",
-                    data: {
-                        search: search
-                    },
-                    success: function(data) {
+                function filterThreads(status) {
+                    $(".thread-card").each(function() {
+                        const threadStatus = $(this).data("status");
 
-                        $('#threadContainer').html('');
+                        if (status === "approved" || status === "pending" || status === "rejected") {
+                            $(this).toggle(threadStatus === status);
+                        } else {
+                            $(this).show();
+                        }
+                    });
+                }
 
-                        data.forEach(thread => {
-                            $('#threadContainer').append(`
-                        <div class="card row" style="padding: 1vw; margin: 2vw;">
-                            <div class="d-flex justify-content-between mb-3 mt-2">
-                                <div class="col-4 fw-bold">${thread.threadName}</div>
-                                <div class="col-4">${thread.threadContent}</div>
-                            </div>
-                            <div class="col">Upvote : ${thread.threadUpvote}</div>
-                        </div>
-                    `);
-                        });
-                    }
+                $('#statusTabs').on('click', '.col', function() {
+                    const status = $(this).text().trim().toLowerCase();
+
+                    $('#statusTabs .col').removeClass('active');
+                    $(this).addClass('active');
+
+                    filterThreads(status);
+                });
+
+                filterThreads("approved");
+            });
+        </script>
+        <script>
+            $(document).ready(function() {
+                const $statusTabs = $('#statusTabs');
+
+
+                $statusTabs.on('click', '.col', function() {
+                    const $clickedTab = $(this);
+
+                    $statusTabs.find('.col').removeClass('active');
+
+                    $clickedTab.addClass('active');
+
+                    const status = $clickedTab.text().trim().toLowerCase();
+                    console.log('Tab aktif saat ini:', status);
                 });
             });
         </script>
+        <style>
+            #statusTabs>div:hover {
+                transition: background-color 1s, color 1s, border-color 1s;
+            }
+
+            .approved-tab.active {
+                color: #187a00 !important;
+                font-weight: 600;
+                box-shadow: 0 -30px 15px -10px rgba(0, 255, 0, 0.384) inset;
+                border-bottom: 2px solid #009113 !important;
+            }
+
+            .approved-tab:hover {
+                font-weight: 600;
+                box-shadow:
+                    0 -30px 15px -10px rgba(0, 255, 0, 0.384) inset;
+
+                border-bottom: 2px solid #009113 !important;
+            }
+
+            .rejected-tab.active {
+                color: #ff0000 !important;
+                font-weight: 600;
+                box-shadow: 0 -30px 15px -10px rgba(255, 105, 105, 0.589) inset;
+                border-bottom: 2px solid #ff0000 !important;
+            }
+
+            .rejected-tab:hover {
+                font-weight: 600;
+                box-shadow: 0 -30px 15px -10px rgba(255, 105, 105, 0.589) inset;
+                border-bottom: 2px solid #ff0000 !important;
+            }
+        </style>
     </body>
 @endsection

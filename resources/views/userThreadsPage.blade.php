@@ -24,12 +24,14 @@
                             $cardBg = match ($thread->threadStatus) {
                                 'Pending' => '#fff7d1', // kuning muda
                                 'Rejected' => '#ffe1e1', // merah muda
-                                default => '#ffffff', // approved putih
+                                default => '#00FF0062', // approved putih
                             };
                         @endphp
 
-                        <a href="{{ route('detail', $thread->id) }}" style="text-decoration:none; color:inherit;">
-                            <div class="card row" style="padding: 1vw; margin: 2vw; background-color: {{ $cardBg }};">
+                        <a href="{{ route('detail', $thread->id) }}?from={{ url()->current() }}"
+                            style="text-decoration:none; color:inherit;">
+                            <div class="card row thread-card"
+                                style="padding: 1vw; margin: 2vw; background-color: {{ $cardBg }};">
 
                                 {{-- Thread Name + Status Badge --}}
                                 <div class="fw-bold mb-2 d-flex align-items-center" style="font-size: 1.2rem; gap: 10px;">
@@ -54,12 +56,18 @@
 
                                 {{-- Info --}}
                                 <div class="d-flex justify-content-between mb-2">
-                                    <div>Upvote : {{ $thread->upvotes_count  }}</div>
+                                    <div>Upvote : {{ $thread->upvotes_count }}</div>
                                     <div>Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
                                 </div>
 
-                                {{-- Only approved can be upvoted --}}
-                                @if ($thread->threadStatus === 'Approved')
+
+                                @if ($thread->upvotes->where('user_id', auth()->id())->isNotEmpty())
+                                    {{-- Sudah pernah upvote --}}
+                                    <button class="btn btn-secondary w-100 mt-2" disabled>
+                                        ✓ Upvoted
+                                    </button>
+                                @elseif($thread->threadStatus === 'Approved')
+                                    {{-- Belum pernah upvote --}}
                                     <form action="{{ route('upvote', $thread->id) }}" method="POST" class="mt-2"
                                         style="max-width: 120px;">
                                         @csrf
@@ -79,30 +87,17 @@
         </div>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
-            $('#searchBox').on('keyup', function() {
-                let search = $(this).val();
+            document.getElementById("searchBox").addEventListener("input", function() {
+                const q = this.value.toLowerCase();
 
-                $.ajax({
-                    url: "{{ route('searchDateSorted') }}",
-                    type: "GET",
-                    data: {
-                        search: search
-                    },
-                    success: function(data) {
+                document.querySelectorAll(".thread-card").forEach(card => {
+                    const title = card.querySelector('.fw-bold').innerText.toLowerCase();
+                    const content = card.querySelector('.mb-3').innerText.toLowerCase();
 
-                        $('#threadContainer').html('');
-
-                        data.forEach(thread => {
-                            $('#threadContainer').append(`
-                        <div class="card row" style="padding: 1vw; margin: 2vw;">
-                            <div class="d-flex justify-content-between mb-3 mt-2">
-                                <div class="col-4 fw-bold">${thread.threadName}</div>
-                                <div class="col-4">${thread.threadContent}</div>
-                            </div>
-                            <div class="col">Upvote : ${thread.threadUpvote}</div>
-                        </div>
-                    `);
-                        });
+                    if (title.includes(q) || content.includes(q)) {
+                        card.style.display = "";
+                    } else {
+                        card.style.display = "none";
                     }
                 });
             });
