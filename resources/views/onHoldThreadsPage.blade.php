@@ -12,7 +12,7 @@
                 <input type="text" id="searchBox" class="form-control" placeholder="Search threads...">
                 <div id="threadContainer">
                     @foreach ($threads as $thread)
-                        <a href="{{ route('adminDetail', $thread->id) }}?from={{ url()->current() }}" style="text-decoration:none; color:inherit;">
+                        <a href="{{ route('detail', $thread->id) }}?from={{ url()->current() }}" style="text-decoration:none; color:inherit;">
                             <div class="card row thread-card" style="padding: 1vw; margin: 2vw; background-color: #fff7d1;">
 
                                 {{-- Thread Name (full width) --}}

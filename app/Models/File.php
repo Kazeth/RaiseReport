@@ -8,16 +8,43 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class File extends Model
 {
-    /** @use HasFactory<\Database\Factories\FileFactory> */
     use HasFactory;
 
     protected $fillable = [
+        'thread_id',
         'fileName',
-        'path'
+        'path',
+        'mime_type',
+        'file_size',
+        'extension',
     ];
 
-    public function thread():BelongsTo
+    protected $casts = [
+        'file_size' => 'integer',
+    ];
+
+    public function thread(): BelongsTo
     {
         return $this->belongsTo(Thread::class);
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return asset('storage/' . $this->path);
+    }
+
+    public function isImage(): bool
+    {
+        return str_starts_with($this->mime_type, 'image/');
+    }
+
+    public function isVideo(): bool
+    {
+        return str_starts_with($this->mime_type, 'video/');
+    }
+
+    public function isAudio(): bool
+    {
+        return str_starts_with($this->mime_type, 'audio/');
     }
 }

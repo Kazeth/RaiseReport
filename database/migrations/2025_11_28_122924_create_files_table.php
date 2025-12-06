@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('threadId');
+            $table->unsignedBigInteger('thread_id');
             $table->string('fileName');
             $table->string('path');
+            $table->string('mime_type')->nullable();
+            $table->unsignedBigInteger('file_size')->nullable();
+            $table->string('extension')->nullable();
             $table->timestamps();
 
-            $table->foreign('threadId')->references('id')->on('threads');
+            $table->foreign('thread_id')->references('id')->on('threads')->onDelete('cascade');
         });
     }
 

@@ -24,41 +24,6 @@ class ThreadController extends Controller
         return view('landingPage', compact('threads'));
     }
 
-
-    public function showIndex(Request $request)
-    {
-        $threads = Thread::where('threadStatus', 'Approved')
-            ->withCount('upvotes')
-            ->orderBy('upvotes_count', 'desc')
-            ->get();
-
-        return response()->json($threads);
-    }
-
-    public function showIndexAuth(Request $request)
-    {
-        $userId = auth()->id();
-
-        // Untuk user login (tambah info user sudah upvote atau belum)
-        $threads = Thread::where('threadStatus', 'Approved')
-            ->where('threadName', 'like', "%{$request->search}%")
-            ->withCount('upvotes')
-            ->orderBy('upvotes_count', 'desc')
-            ->get()
-            ->map(function ($t) use ($userId) {
-                return [
-                    'id' => $t->id,
-                    'threadName' => $t->threadName,
-                    'threadContent' => $t->threadContent,
-                    'upvotes_count' => $t->upvotes_count,
-                    'created_at_formatted' => $t->created_at->translatedFormat('d F Y - H.i'),
-                    'hasUpvoted' => $t->upvotes()->where('user_id', $userId)->exists(),
-                ];
-            });
-
-        return response()->json($threads);
-    }
-
     // Threads Page
     public function sortByDate(Request $request)
     {
@@ -72,42 +37,34 @@ class ThreadController extends Controller
         return view('threadsPage', compact('threads'));
     }
 
-    public function searchSortByDate(Request $request)
-    {
-        $threads = Thread::where('threadName', 'like', "%{$request->search}%")
-            ->where('threadStatus', 'like', "%approved%")
-            ->withCount('upvotes')
-            ->with(['upvotes' => function ($q) {
-                $q->where('user_id', auth()->id());
-            }])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($t) {
-                return [
-                    'id' => $t->id,
-                    'threadName' => $t->threadName,
-                    'threadContent' => $t->threadContent,
-                    'upvotes' => $t->upvotes,
-                    'upvotes_count' => $t->upvotes_count,
-                    'created_at_formatted' => $t->created_at->translatedFormat('d F Y - H.i'),
-                ];
-            });
-
-        return response()->json($threads);
-    }
-
     // Thread Detail Page
     public function show($id)
     {
-        $thread = Thread::withCount('upvotes')->findOrFail($id);
+        $thread = Thread::with(['files'])->withCount('upvotes')->findOrFail($id);
         return view('threadDetailPage', compact('thread'));
+    }
+
+    /* =============== */
+    /* =====USER===== */
+    /* =============== */
+
+    // User's Threads Page
+    public function userIndex()
+    {
+        $userId = auth()->id();
+        $threads = Thread::where('userId', $userId)
+            ->with(['upvotes' => function ($q) {
+                $q->where('user_id', auth()->id());
+            }])
+            ->orderBy('created_at', 'desc')->withCount('upvotes')
+            ->get();
+
+        return view('userThreadsPage', compact('threads'));
     }
 
     // Create Thread Page
 
     // Edit Thread Page
-
-    // Profile Page
 
     // User's utilities
     public function upvote($id)
@@ -136,36 +93,18 @@ class ThreadController extends Controller
         return redirect()->back()->with('success', 'Upvoted!');
     }
 
-    //
+    /* =============== */
+    /* =====ADMIN===== */
+    /* =============== */
+
+    // Manage Thread Page
     public function adminIndex()
     {
         $threads = Thread::withCount('upvotes')
             ->orderBy('upvotes_count', 'desc')->get();
         return view('manageThreadPage', compact('threads'));
     }
-
-    public function showPending()
-    {
-        $threads = Thread::where('threadStatus', 'like', "%pending%")->withCount('upvotes')
-            ->orderBy('upvotes_count', 'desc')
-            ->get()
-            ->map(function ($t) {
-                $t->created_at_formatted = $t->created_at->translatedFormat('d F Y - H.i');
-                return $t;
-            });
-        return view('onHoldThreadsPage', compact('threads'));
-    }
-
-    public function searchAdmin(Request $request)
-    {
-        $threads = Thread::where('threadName', 'like', "%{$request->search}%")
-            ->withCount('upvotes')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return response()->json($threads);
-    }
-
+    // Admin's utilities
     public function approve($id)
     {
         $thread = Thread::findOrFail($id);
@@ -193,20 +132,22 @@ class ThreadController extends Controller
         return back()->with('success', 'Reverted!');
     }
 
-
-
-    public function userIndex()
+    // On-Hold Threads Page
+    public function showPending()
     {
-        $userId = auth()->id();
-        $threads = Thread::where('userId', $userId)
-            ->with(['upvotes' => function ($q) {
-                $q->where('user_id', auth()->id());
-            }])
-            ->orderBy('created_at', 'desc')->withCount('upvotes')
-            ->get();
-
-        return view('userThreadsPage', compact('threads'));
+        $threads = Thread::where('threadStatus', 'like', "%pending%")->withCount('upvotes')
+            ->orderBy('upvotes_count', 'desc')
+            ->get()
+            ->map(function ($t) {
+                $t->created_at_formatted = $t->created_at->translatedFormat('d F Y - H.i');
+                return $t;
+            });
+        return view('onHoldThreadsPage', compact('threads'));
     }
+
+
+
+
 
 
 

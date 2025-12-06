@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use App\Http\Controllers\Controller;
+use App\Models\Thread;
 use Illuminate\Http\Request;
 
 class FileController extends Controller
@@ -11,6 +12,32 @@ class FileController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    public function storeFiles(Request $request, $threadId)
+    {
+        $request->validate([
+            'attachments.*' => 'file|max:51200', // max 50MB per file
+        ]);
+
+        $thread = Thread::findOrFail($threadId);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('attachments', 'public');
+
+                $thread->files()->create([
+                    'fileName' => $file->getClientOriginalName(),
+                    'path' => $path,
+                    'mime_type' => $file->getClientMimeType(),
+                    'file_size' => $file->getSize(),
+                    'extension' => $file->getClientOriginalExtension(),
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Files uploaded.');
+    }
+
     public function index()
     {
         //

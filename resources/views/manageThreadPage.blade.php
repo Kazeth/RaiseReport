@@ -34,7 +34,7 @@
 
                         @endphp
 
-                        <a href="{{ route('adminDetail', $thread->id) }}?from={{ url()->current() }}" style="text-decoration:none; color:inherit;">
+                        <a href="{{ route('detail', $thread->id) }}?from={{ url()->current() }}" style="text-decoration:none; color:inherit;">
                             <div class="card row thread-card" data-status="{{ strtolower($thread->threadStatus) }}"
                                 style="padding: 1vw; margin: 2vw; background-color: {{ $cardBg }};">
 

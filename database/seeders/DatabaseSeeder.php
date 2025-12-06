@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\File;
 use App\Models\Thread;
 use App\Models\Upvote;
 use App\Models\User;
@@ -17,11 +18,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(50)->create();
+        $this->call(UserSeeder::class);
         Thread::factory(50)->create();
         Upvote::factory(200)
             ->make()
             ->unique(fn($u) => $u->user_id . '-' . $u->thread_id)
             ->each(fn($u) => $u->save());
+
+        $this->call(FileSeeder::class);
     }
 }
