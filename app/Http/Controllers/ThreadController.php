@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Thread;
 use App\Http\Controllers\Controller;
+use App\Models\File;
 use App\Models\Upvote;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
 
 class ThreadController extends Controller
 {
@@ -41,6 +44,12 @@ class ThreadController extends Controller
     public function show($id)
     {
         $thread = Thread::with(['files'])->withCount('upvotes')->findOrFail($id);
+
+        if (!$thread) {
+            return redirect()->route('threads')
+                ->with('warning', 'The thread you were viewing has been deleted.');
+        }
+
         return view('threadDetailPage', compact('thread'));
     }
 
@@ -63,8 +72,95 @@ class ThreadController extends Controller
     }
 
     // Create Thread Page
+    public function store(Request $request)
+    {
+        $request->validate([
+            'threadName' => 'required|max:255',
+            'threadContent' => 'required',
+            'files.*' => 'nullable|mimes:jpg,jpeg,png,pdf,mp4,mp3,wav,webm|max:51200', // 50MB
+        ]);
+
+        $thread = Thread::create([
+            'userId' => auth()->id(),
+            'threadName' => $request->threadName,
+            'threadContent' => $request->threadContent,
+            'threadStatus' => 'Pending',
+        ]);
+
+        // Handle attachments
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+
+                $path = $file->store('threadFiles', 'public');
+
+                $thread->files()->create([
+                    'fileName' => $file->getClientOriginalName(),
+                    'extension' => $file->getClientOriginalExtension(),
+                    'path' => $path
+                ]);
+            }
+        }
+
+        return redirect()->route('userThreads')->with('success', 'Thread created and awaiting approval!');
+    }
 
     // Edit Thread Page
+    public function edit($id)
+    {
+        $thread = Thread::with('files')->findOrFail($id);
+
+        // Pastikan user hanya bisa edit thread miliknya
+        if ($thread->userId !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('editThreadPage', compact('thread'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $thread = Thread::findOrFail($id);
+
+        $thread->threadName = $request->threadName;
+        $thread->threadContent = $request->threadContent;
+        $thread->threadStatus = 'Pending';
+        $thread->save();
+
+        if ($request->remove_files) {
+            foreach ($request->remove_files as $fileId) {
+
+                $file = File::find($fileId);
+
+                if ($file) {
+                    // Hapus file fisik di storage/public
+                    if (Storage::disk('public')->exists($file->path)) {
+                        Storage::disk('public')->delete($file->path);
+                    }
+
+                    $file->delete();
+                }
+            }
+        }
+
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $uploadedFile) {
+
+                $path = $uploadedFile->store('thread_files', 'public');
+
+                File::create([
+                    'thread_id' => $thread->id,
+                    'fileName' => $uploadedFile->getClientOriginalName(),
+                    'path' => $path,
+                    'mime_type' => $uploadedFile->getClientMimeType(),
+                    'file_size' => $uploadedFile->getSize(),
+                    'extension' => $uploadedFile->getClientOriginalExtension(),
+                ]);
+            }
+        }
+
+        return redirect()->route('detail', $thread->id)
+            ->with('success', 'Thread updated successfully.');
+    }
 
     // User's utilities
     public function upvote($id)
@@ -91,6 +187,34 @@ class ThreadController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Upvoted!');
+    }
+
+    public function destroy($id)
+    {
+        $thread = Thread::with('files')->findOrFail($id);
+
+        if ($thread->userId !== auth()->id() && auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Hapus file fisik dan database
+        foreach ($thread->files as $file) {
+            if (Storage::disk('public')->exists($file->path)) {
+                Storage::disk('public')->delete($file->path);
+            }
+            $file->delete();
+        }
+
+        // Hapus upvote terkait
+        $thread->upvotes()->delete();
+
+        // Hapus thread
+        $thread->delete();
+
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('onHoldThreads')->with('success', 'Thread deleted successfully.');
+        }
+        return redirect()->route('userThreads')->with('success', 'Thread deleted successfully.');
     }
 
     /* =============== */
@@ -143,53 +267,5 @@ class ThreadController extends Controller
                 return $t;
             });
         return view('onHoldThreadsPage', compact('threads'));
-    }
-
-
-
-
-
-
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Thread $thread)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Thread $thread)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Thread $thread)
-    {
-        //
     }
 }

@@ -27,6 +27,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login_process'])->name('login.process');
 });
 
+// Delete Thread
+    Route::delete('/thread/{id}', [ThreadController::class, 'destroy'])->name('thread.delete');
+
 Route::middleware('user')->group(function () {
     // Upvote
     Route::get('/thread/{id}/upvote', [ThreadController::class, 'upvote'])->name('upvote');
@@ -39,11 +42,11 @@ Route::middleware('user')->group(function () {
     Route::get('/createThread', function () {
         return view('createThreadPage');
     })->name('createThread');
+    Route::post('/createThread', [ThreadController::class, 'store'])->name('thread.store');
 
     // Edit Thread Page
-    Route::get('/editThread', function () {
-        return view('editThreadPage');
-    })->name('editThread');
+    Route::get('/editThread/{id}', [ThreadController::class, 'edit'])->name('editThread');
+    Route::post('/editThread/{id}', [ThreadController::class, 'update'])->name('thread.update');
 
     // Profile Page
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
@@ -59,6 +62,7 @@ Route::middleware('admin')->group(function () {
     Route::post('/manageThread/{id}/reject', [ThreadController::class, 'reject'])->name('reject');
     // Revert
     Route::post('/manageThread/{id}/revert', [ThreadController::class, 'revert'])->name('revert');
+
 
     // On-Hold Threads Page
     Route::get('/onHoldThreads', [ThreadController::class, 'showPending'])->name('onHoldThreads');

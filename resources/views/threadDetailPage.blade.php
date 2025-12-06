@@ -7,10 +7,30 @@
     <body>
         <div class="container mt-5" style="max-width: 700px;">
 
-            <!-- Back button -->
-            <a href="{{ request('from') ?? route('threads') }}" class="btn btn-secondary mb-3">
-                ← Back
-            </a>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Back Button -->
+                <a href="{{ request('from') ?? route('threads') }}" class="btn btn-secondary">
+                    ← Back
+                </a>
+
+                <div class="d-flex gap-2">
+                    @if (auth()->check() && auth()->id() === $thread->userId)
+                        <a href="{{ route('editThread', $thread->id) }}" class="btn btn-warning">
+                            ✏ Edit Thread
+                        </a>
+                    @endif
+
+                    @if (auth()->check() && (auth()->id() === $thread->userId || auth()->user()->role === 'admin'))
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteThreadModal">
+                            🗑 Delete
+                        </button>
+                    @endif
+
+                </div>
+
+
+            </div>
+
 
             @php
                 $cardBg = match ($thread->threadStatus) {
@@ -23,7 +43,33 @@
             <!-- Thread Card -->
             <div class="card shadow-sm p-4 " style="background-color:{{ $cardBg }};">
 
-                <h2 class="fw-bold">{{ $thread->threadName }}</h2>
+                <h2 class="fw-bold d-flex align-items-center gap-2">
+                    {{ $thread->threadName }}
+
+                    @if ($thread->threadStatus === 'Pending' && auth()->check() && auth()->user()->role === 'user')
+                        <span class="info-dot custom-tip">
+                            i
+                            <span class="custom-tooltip">
+                                This thread is currently under review.<br>
+                                It may have been pulled back by an admin,<br>
+                                even if it was previously approved.
+                            </span>
+                        </span>
+                    @endif
+
+
+                    @if ($thread->threadStatus === 'Rejected' && auth()->user()->role === 'user')
+                        <span class="info-dot custom-tip">
+                            i
+                            <span class="custom-tooltip">
+                                This thread was rejected.<br>
+                                Editing will resubmit it for review.
+                            </span>
+                        </span>
+                    @endif
+                </h2>
+
+
 
                 <p class="text-muted">
                     Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}
@@ -201,7 +247,7 @@
             `;
                 }
             });
-            
+
             previewModal.addEventListener('hidden.bs.modal', function() {
                 const video = document.querySelector('#modalPreviewBody video');
                 const audio = document.querySelector('#modalPreviewBody audio');
@@ -220,5 +266,125 @@
                 document.getElementById('modalPreviewBody').innerHTML = '<p class="text-muted">Loading preview...</p>';
             });
         </script>
+        <style>
+            /* === ICON === */
+            .info-dot {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+
+                width: 22px;
+                height: 22px;
+
+                border: 2px solid #bfbfbf;
+                /* abu */
+                border-radius: 50%;
+                background: transparent;
+                color: #bfbfbf;
+
+                font-size: 14px;
+                font-weight: bold;
+                line-height: 1;
+
+                cursor: pointer;
+                position: relative;
+                /* penting untuk tooltip */
+            }
+
+            .info-dot:hover {
+                border-color: #999;
+                color: #999;
+                transition: 0.2s;
+            }
+
+            /* === CUSTOM TOOLTIP === */
+            .custom-tooltip {
+                visibility: hidden;
+                opacity: 0;
+
+                position: absolute;
+                top: 50%;
+                left: 32px;
+                /* posisi tooltip di kanan ikon */
+                transform: translateY(-50%);
+
+                background: #333;
+                color: #fff;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 0.85rem;
+                line-height: 1.3;
+                width: max-content;
+                max-width: 300px;
+
+                transition: 0.2s ease;
+                z-index: 999;
+                pointer-events: none;
+            }
+
+            /* segitiga kecil */
+            .custom-tooltip::after {
+                content: "";
+                position: absolute;
+                left: -6px;
+                top: 50%;
+                transform: translateY(-50%);
+                border-width: 6px;
+                border-style: solid;
+                border-color: transparent #333 transparent transparent;
+            }
+
+            /* show on hover */
+            .custom-tip:hover .custom-tooltip {
+                visibility: visible;
+                opacity: 1;
+                transform: translate(5px, -50%);
+            }
+        </style>
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteThreadModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">⚠ Delete Thread</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p class="mb-2">
+                            Are you sure you want to delete this thread?
+                        </p>
+                        <p class="text-danger fw-bold mb-0">
+                            This action cannot be undon3e.
+                        </p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                        <form id="deleteThreadForm" action="{{ route('thread.delete', $thread->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-danger">
+                                Yes, Delete
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <style>
+            .modal-content {
+                border-radius: 12px;
+            }
+
+            .modal-header {
+                border-top-left-radius: 12px !important;
+                border-top-right-radius: 12px !important;
+            }
+        </style>
+
     </body>
 @endsection

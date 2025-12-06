@@ -13,6 +13,7 @@ class Thread extends Model
     use HasFactory;
 
     protected $fillable = [
+        'userId',
         'threadName',
         'threadContent',
         'threadUpvote',

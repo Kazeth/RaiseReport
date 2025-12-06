@@ -14,7 +14,6 @@
                 @if (auth()->user()->role === 'user')
                     <a href='{{ route('userThreads') }}' class="mx-3">My Threads </a>
                     <a href='{{ route('createThread') }}' class="mx-3">Create Thread</a>
-                    <a href='{{ route('editThread') }}' class="mx-3">Edit Thread</a>
                     <a href='{{ route('profile') }}' class="mx-3">Profile</a>
                 @endif
 
