@@ -14,9 +14,6 @@ class UpvoteSeeder extends Seeder
     public function run(): void
     {
         //
-        Upvote::factory(20)
-            ->make()
-            ->unique(fn($u) => $u->user_id . '-' . $u->thread_id)
-            ->each(fn($u) => $u->save());
+        Upvote::factory(50)->create();
     }
 }

@@ -30,7 +30,7 @@ class ThreadController extends Controller
     // Threads Page
     public function sortByDate(Request $request)
     {
-        $threads = Thread::where('threadStatus', 'like', "%approved%")
+        $threads = Thread::where('threadStatus', 'Approved')
             ->withCount('upvotes')
             ->with(['upvotes' => function ($q) {
                 $q->where('user_id', auth()->id());
@@ -259,7 +259,8 @@ class ThreadController extends Controller
     // On-Hold Threads Page
     public function showPending()
     {
-        $threads = Thread::where('threadStatus', 'like', "%pending%")->withCount('upvotes')
+        $threads = Thread::where('threadStatus', 'Pending')
+            ->withCount('upvotes')
             ->orderBy('upvotes_count', 'desc')
             ->get()
             ->map(function ($t) {

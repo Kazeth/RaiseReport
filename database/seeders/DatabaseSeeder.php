@@ -20,11 +20,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(UserSeeder::class);
         Thread::factory(50)->create();
-        Upvote::factory(200)
-            ->make()
-            ->unique(fn($u) => $u->user_id . '-' . $u->thread_id)
-            ->each(fn($u) => $u->save());
-
+        Upvote::factory(100)->create();
         $this->call(FileSeeder::class);
     }
 }

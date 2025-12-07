@@ -23,7 +23,7 @@ class UpvoteFactory extends Factory
 
         if (!$combos) {
             $users = User::pluck('id')->toArray();
-            $threads = Thread::where('threadStatus', 'approved')->pluck('id')->toArray();
+            $threads = Thread::where('threadStatus', 'Approved')->pluck('id')->toArray();
 
             if (empty($users) || empty($threads)) {
                 throw new \Exception("Tidak ada user atau thread approved untuk membuat upvote.");

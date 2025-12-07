@@ -20,6 +20,6 @@ class UserSeeder extends Seeder
             'password' => bcrypt('123456'),
             'role' => 'admin', // pastikan kolom role ada di tabel users
         ]);
-        User::factory(50)->create();
+        User::factory(10)->create();
     }
 }
