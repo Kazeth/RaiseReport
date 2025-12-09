@@ -32,7 +32,6 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('user')->group(function () {
     // Upvote
-    Route::get('/thread/{id}/upvote', [ThreadController::class, 'upvote'])->name('upvote');
     Route::post('/thread/{id}/upvote', [ThreadController::class, 'upvote'])->name('upvote');
 
     // User's Threads Page
