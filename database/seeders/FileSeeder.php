@@ -32,14 +32,14 @@ class FileSeeder extends Seeder
             // Ambil file mock random
             $f = $mockFiles[array_rand($mockFiles)];
 
-            $source = database_path("seeders/mock_files/{$f}");
+            $source = database_path("uploads/mock_files/{$f}");
             if (!file_exists($source)) continue;
 
             // Pilih thread random
             $thread = $threads->random();
 
             // Generate nama baru di storage
-            $destPath = 'attachments/' . uniqid() . "_" . $f;
+            $destPath = 'uploads/' . uniqid() . "_" . $f;
             $destFull = storage_path("app/public/{$destPath}");
 
             // Buat folder jika belum ada

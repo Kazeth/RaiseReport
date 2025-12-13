@@ -150,16 +150,22 @@ class ThreadController extends Controller
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $uploadedFile) {
 
-                $fileName = uniqid() . '_' . $uploadedFile->getClientOriginalName();
+                // ⬅️ AMBIL SEMUA INFO SEBELUM move()
+                $originalName = $uploadedFile->getClientOriginalName();
+                $extension    = $uploadedFile->getClientOriginalExtension();
+                $mimeType     = $uploadedFile->getClientMimeType();
+                $size         = $uploadedFile->getSize();
+
+                $fileName = uniqid() . '_' . $originalName;
                 $uploadedFile->move(public_path('uploads'), $fileName);
 
                 File::create([
                     'thread_id' => $thread->id,
-                    'fileName'  => $uploadedFile->getClientOriginalName(),
+                    'fileName'  => $originalName,
                     'path'      => 'uploads/' . $fileName,
-                    'mime_type' => $uploadedFile->getClientMimeType(),
-                    'file_size' => $uploadedFile->getSize(),
-                    'extension' => $uploadedFile->getClientOriginalExtension(),
+                    'mime_type' => $mimeType,
+                    'file_size' => $size,
+                    'extension' => $extension,
                 ]);
             }
         }
