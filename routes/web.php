@@ -15,28 +15,6 @@ Route::get('/threads', [ThreadController::class, 'sortByDate'])->name('threads')
 // Thread Detail Page
 Route::get('/thread/{id}', [ThreadController::class, 'show'])->name('detail');
 
-// File Fetch
-Route::get('/files/{path}', function ($path) {
-    if (!Storage::disk('public')->exists($path)) {
-        abort(404);
-    }
-
-    $fullPath = storage_path('app/public/' . $path);
-
-    if (!file_exists($fullPath)) {
-        abort(404);
-    }
-
-    $mime = function_exists('mime_content_type')
-        ? mime_content_type($fullPath)
-        : 'application/octet-stream';
-
-    return Response::file($fullPath, [
-        'Content-Type' => $mime,
-        'Content-Disposition' => 'inline'
-    ]);
-})->where('path', '.*');
-
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

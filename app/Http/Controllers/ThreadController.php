@@ -91,7 +91,11 @@ class ThreadController extends Controller
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
 
-                $path = $file->store('threadFiles', 'public');
+                $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads'), $fileName);
+
+                $path = 'uploads/' . $fileName;
+
 
                 $thread->files()->create([
                     'fileName' => $file->getClientOriginalName(),
