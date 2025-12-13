@@ -145,7 +145,7 @@ class ThreadController extends Controller
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $uploadedFile) {
 
-                $path = $uploadedFile->store('thread_files', 'public');
+                $path = $uploadedFile->store('threadFiles', 'public');
 
                 File::create([
                     'thread_id' => $thread->id,

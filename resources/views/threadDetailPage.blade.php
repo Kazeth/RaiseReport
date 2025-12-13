@@ -109,7 +109,7 @@
                                 </div>
 
                                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal"
-                                    data-file-url="{{ asset('storage/' . $file->path) }}"
+                                    data-file-url="{{ Storage::url($file->path) }}"
                                     data-file-type="{{ strtolower($file->extension) }}">
                                     View
                                 </button>
