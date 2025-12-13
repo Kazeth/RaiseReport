@@ -152,24 +152,18 @@ class ThreadController extends Controller
         }
 
         if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $uploadedFile) {
+            $storage = new SupabaseStorage();
 
-                // ⬅️ AMBIL SEMUA INFO SEBELUM move()
-                $originalName = $uploadedFile->getClientOriginalName();
-                $extension    = $uploadedFile->getClientOriginalExtension();
-                $mimeType     = $uploadedFile->getClientMimeType();
-                $size         = $uploadedFile->getSize();
+            foreach ($request->file('files') as $file) {
+                $path = 'threads/' . uniqid() . '_' . $file->getClientOriginalName();
+                $publicUrl = $storage->upload($file, $path);
 
-                $fileName = uniqid() . '_' . $originalName;
-                $uploadedFile->move(public_path('uploads'), $fileName);
-
-                File::create([
-                    'thread_id' => $thread->id,
-                    'fileName'  => $originalName,
-                    'path'      => 'uploads/' . $fileName,
-                    'mime_type' => $mimeType,
-                    'file_size' => $size,
-                    'extension' => $extension,
+                $thread->files()->create([
+                    'fileName'  => $file->getClientOriginalName(),
+                    'path'      => $publicUrl,
+                    'mime_type' => $file->getClientMimeType(),
+                    'file_size' => $file->getSize(),
+                    'extension' => $file->getClientOriginalExtension(),
                 ]);
             }
         }
