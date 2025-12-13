@@ -5,60 +5,59 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\File;
 use App\Models\Thread;
+use App\Services\SupabaseStorage;
 
 class FileSeeder extends Seeder
 {
     public function run()
     {
-        $mockFiles = array_values(array_diff(
-            scandir(database_path('seeders/mock_files')),
-            ['.', '..']
-        ));
+        $storage = new SupabaseStorage();
+
+        $mockDir = database_path('seeders/mock_files');
+        $mockFiles = array_values(array_diff(scandir($mockDir), ['.', '..']));
 
         if (empty($mockFiles)) {
-            dump("❌ Tidak ada file dalam mock_files");
+            $this->command->warn('❌ mock_files kosong');
             return;
         }
 
         $threads = Thread::all();
         if ($threads->isEmpty()) {
-            dump("❌ Thread belum ada. Jalankan ThreadSeeder dulu.");
+            $this->command->warn('❌ Thread belum ada');
             return;
         }
 
-        // Buat 100 file random
-        for ($i = 0; $i < 100; $i++) {
+        // jumlah mock attachment
+        for ($i = 0; $i < 50; $i++) {
 
-            // Ambil file mock random
-            $f = $mockFiles[array_rand($mockFiles)];
-
-            $source = database_path("uploads/mock_files/{$f}");
-            if (!file_exists($source)) continue;
-
-            // Pilih thread random
             $thread = $threads->random();
+            $fileName = $mockFiles[array_rand($mockFiles)];
+            $localPath = $mockDir . '/' . $fileName;
 
-            // Generate nama baru di storage
-            $destPath = 'uploads/' . uniqid() . "_" . $f;
-            $destFull = storage_path("app/public/{$destPath}");
-
-            // Buat folder jika belum ada
-            if (!file_exists(dirname($destFull))) {
-                mkdir(dirname($destFull), 0755, true);
+            if (!file_exists($localPath)) {
+                continue;
             }
 
-            // Copy file ke storage/public
-            copy($source, $destFull);
+            // path di Supabase (SAMA DENGAN USER UPLOAD)
+            $supabasePath = 'threads/' . uniqid() . '_' . $fileName;
 
-            // Simpan ke database
+            // upload ke Supabase
+            $publicUrl = $storage->uploadFromPath(
+                $localPath,
+                $supabasePath
+            );
+
+            // simpan ke database
             File::create([
                 'thread_id' => $thread->id,
-                'fileName' => $f,
-                'path' => $destPath,
-                'mime_type' => mime_content_type($destFull),
-                'file_size' => filesize($destFull),
-                'extension' => pathinfo($f, PATHINFO_EXTENSION),
+                'fileName'  => $fileName,
+                'path'      => $publicUrl, // ⬅️ URL SUPABASE
+                'mime_type' => mime_content_type($localPath),
+                'file_size' => filesize($localPath),
+                'extension' => pathinfo($fileName, PATHINFO_EXTENSION),
             ]);
         }
+
+        $this->command->info('FileSeeder Supabase done');
     }
 }

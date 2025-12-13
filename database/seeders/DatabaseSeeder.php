@@ -21,6 +21,5 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         Thread::factory(50)->create();
         Upvote::factory(100)->create();
-        $this->call(FileSeeder::class);
     }
 }

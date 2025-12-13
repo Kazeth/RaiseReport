@@ -3,8 +3,6 @@
 use App\Http\Controllers\ThreadController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Storage;
 
 // Landing Page
 Route::get('/', [ThreadController::class, 'index'])->name('home');

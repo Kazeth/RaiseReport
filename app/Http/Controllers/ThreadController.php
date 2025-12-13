@@ -8,6 +8,7 @@ use App\Models\File;
 use App\Models\Upvote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\SupabaseStorage;
 
 
 class ThreadController extends Controller
@@ -75,38 +76,43 @@ class ThreadController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'threadName' => 'required|max:255',
+            'threadName'    => 'required|max:255',
             'threadContent' => 'required',
-            'files.*' => 'nullable|mimes:jpg,jpeg,png,pdf,mp4,mp3,wav,webm|max:51200', // 50MB
+            'files.*'       => 'nullable|mimes:jpg,jpeg,png,pdf,mp4,mp3,wav,webm|max:51200',
         ]);
 
         $thread = Thread::create([
-            'userId' => auth()->id(),
-            'threadName' => $request->threadName,
+            'userId'        => auth()->id(),
+            'threadName'    => $request->threadName,
             'threadContent' => $request->threadContent,
-            'threadStatus' => 'Pending',
+            'threadStatus'  => 'Pending',
         ]);
 
-        // Handle attachments
         if ($request->hasFile('files')) {
+
+            $storage = new SupabaseStorage();
+
             foreach ($request->file('files') as $file) {
 
-                $fileName = uniqid() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('uploads'), $fileName);
+                $path = 'threads/' . uniqid() . '_' . $file->getClientOriginalName();
 
-                $path = 'uploads/' . $fileName;
-
+                $publicUrl = $storage->upload($file, $path);
 
                 $thread->files()->create([
-                    'fileName' => $file->getClientOriginalName(),
+                    'fileName'  => $file->getClientOriginalName(),
+                    'path'      => $publicUrl, // URL Supabase
+                    'mime_type' => $file->getClientMimeType(),
+                    'file_size' => $file->getSize(),
                     'extension' => $file->getClientOriginalExtension(),
-                    'path' => $path
                 ]);
             }
         }
 
-        return redirect()->route('userThreads')->with('success', 'Thread created and awaiting approval!');
+        return redirect()
+            ->route('userThreads')
+            ->with('success', 'Thread created and awaiting approval!');
     }
+
 
     // Edit Thread Page
     public function edit($id)
@@ -131,17 +137,15 @@ class ThreadController extends Controller
         $thread->save();
 
         if ($request->remove_files) {
+
+            $storage = new SupabaseStorage();
+
             foreach ($request->remove_files as $fileId) {
 
                 $file = File::find($fileId);
 
                 if ($file) {
-                    $fullPath = public_path($file->path);
-
-                    if (file_exists($fullPath)) {
-                        unlink($fullPath);
-                    }
-
+                    $storage->delete($file->path);
                     $file->delete();
                 }
             }
@@ -207,27 +211,21 @@ class ThreadController extends Controller
         $thread = Thread::with('files')->findOrFail($id);
 
         if ($thread->userId !== auth()->id() && auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized action.');
+            abort(403);
         }
 
-        // Hapus file fisik dan database
+        $storage = new SupabaseStorage();
+
         foreach ($thread->files as $file) {
-            if (Storage::disk('public')->exists($file->path)) {
-                Storage::disk('public')->delete($file->path);
-            }
-            $file->delete();
+            $storage->delete($file->path); // ⬅️ hapus di Supabase
+            $file->delete();               // ⬅️ hapus di DB
         }
 
-        // Hapus upvote terkait
         $thread->upvotes()->delete();
-
-        // Hapus thread
         $thread->delete();
 
-        if (auth()->user()->role === 'admin') {
-            return redirect()->route('onHoldThreads')->with('success', 'Thread deleted successfully.');
-        }
-        return redirect()->route('userThreads')->with('success', 'Thread deleted successfully.');
+        return redirect()->route('userThreads')
+            ->with('success', 'Thread deleted successfully.');
     }
 
     /* =============== */
