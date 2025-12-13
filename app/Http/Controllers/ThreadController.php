@@ -136,9 +136,10 @@ class ThreadController extends Controller
                 $file = File::find($fileId);
 
                 if ($file) {
-                    // Hapus file fisik di storage/public
-                    if (Storage::disk('public')->exists($file->path)) {
-                        Storage::disk('public')->delete($file->path);
+                    $fullPath = public_path($file->path);
+
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
                     }
 
                     $file->delete();
@@ -149,12 +150,13 @@ class ThreadController extends Controller
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $uploadedFile) {
 
-                $path = $uploadedFile->store('threadFiles', 'public');
+                $fileName = uniqid() . '_' . $uploadedFile->getClientOriginalName();
+                $uploadedFile->move(public_path('uploads'), $fileName);
 
                 File::create([
                     'thread_id' => $thread->id,
-                    'fileName' => $uploadedFile->getClientOriginalName(),
-                    'path' => $path,
+                    'fileName'  => $uploadedFile->getClientOriginalName(),
+                    'path'      => 'uploads/' . $fileName,
                     'mime_type' => $uploadedFile->getClientMimeType(),
                     'file_size' => $uploadedFile->getSize(),
                     'extension' => $uploadedFile->getClientOriginalExtension(),
@@ -165,6 +167,7 @@ class ThreadController extends Controller
         return redirect()->route('detail', $thread->id)
             ->with('success', 'Thread updated successfully.');
     }
+
 
     // User's utilities
     public function upvote($id)
