@@ -1,3 +1,5 @@
+<?php
+
 return [
     'threads' => 'Threads',
     'my_threads' => 'My Threads',
