@@ -12,11 +12,11 @@
                 <div class="d-flex mt-5 p-0" id="statusTabs">
 
                     <div class="col m-0 text-center py-2 approved-tab active"
-                        style="background-color: transparent; color: #6c757d; cursor: pointer;">
+                        style="background-color: transparent; color: #6c757d; cursor: pointer;" data-status="approved">
                         @lang('messages.approved')
                     </div>
                     <div class="col text-center py-2 rejected-tab"
-                        style="background-color: transparent; color: #6c757d; cursor: pointer;">
+                        style="background-color: transparent; color: #6c757d; cursor: pointer;" data-status="rejected">
                         @lang('messages.rejected')
                     </div>
                 </div>
@@ -34,7 +34,8 @@
 
                         @endphp
 
-                        <a href="{{ route('detail', $thread->id) }}?from={{ url()->current() }}" style="text-decoration:none; color:inherit;">
+                        <a href="{{ route('detail', $thread->id) }}?from={{ url()->current() }}"
+                            style="text-decoration:none; color:inherit;">
                             <div class="card row thread-card" data-status="{{ strtolower($thread->threadStatus) }}"
                                 style="padding: 1vw; margin: 2vw; background-color: {{ $cardBg }};">
 
@@ -85,21 +86,15 @@
                 function filterThreads(status) {
                     $(".thread-card").each(function() {
                         const threadStatus = $(this).data("status");
-
-                        if (status === "approved" || status === "pending" || status === "rejected") {
-                            $(this).toggle(threadStatus === status);
-                        } else {
-                            $(this).show();
-                        }
+                        $(this).toggle(threadStatus === status);
                     });
                 }
 
                 $('#statusTabs').on('click', '.col', function() {
-                    const status = $(this).text().trim().toLowerCase();
-
                     $('#statusTabs .col').removeClass('active');
                     $(this).addClass('active');
 
+                    const status = $(this).data('status'); 
                     filterThreads(status);
                 });
 
