@@ -19,7 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => AdminMiddleware::class,
             'user'  => UserMiddleware::class,
             'proxy' => TrustProxies::class,
-            'locale' => SetLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
