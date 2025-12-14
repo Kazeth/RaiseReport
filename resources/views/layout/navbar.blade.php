@@ -33,10 +33,22 @@
     {{-- Auth --}}
     <div class="col-4 d-flex justify-content-end align-items-center">
         {{-- Language Switch --}}
+        @php
+            $currentLocale = app()->getLocale();
+        @endphp
+
         <div class="mx-3">
-            <a href="{{ route('lang.switch', 'id') }}" class="mx-1">ID</a> |
-            <a href="{{ route('lang.switch', 'en') }}" class="mx-1">EN</a>
+            <a href="{{ route('lang.switch', 'id') }}"
+                class="mx-1 {{ $currentLocale === 'id' ? 'fw-bold text-primary' : '' }}">
+                ID
+            </a>
+            |
+            <a href="{{ route('lang.switch', 'en') }}"
+                class="mx-1 {{ $currentLocale === 'en' ? 'fw-bold text-primary' : '' }}">
+                EN
+            </a>
         </div>
+
 
         @guest
             <a href="{{ route('register') }}" class="mx-2">@lang('messages.register')</a>
