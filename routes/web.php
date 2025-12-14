@@ -3,13 +3,9 @@
 use App\Http\Controllers\ThreadController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LocaleController;
 
-Route::get('/lang/{locale}', function ($locale) {
-    if (in_array($locale, ['en', 'id'])) {
-        session(['locale' => $locale]);
-    }
-    return redirect()->back();
-})->name('lang.switch');
+Route::get('/locale/{lang}', [LocaleController::class, 'setLocale'])->name('lang.switch');
 
 // Landing Page
 Route::get('/', [ThreadController::class, 'index'])->name('home');

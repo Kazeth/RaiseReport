@@ -10,22 +10,22 @@
 
     {{-- Menu --}}
     <div class="col-6 d-flex align-items-center">
-        <a href="{{ route('threads') }}" class="mx-3">{{ __('app.threads') }}</a>
+        <a href="{{ route('threads') }}" class="mx-3">@lang('messages.threads')</a>
 
         @auth
             @if (auth()->user()->role === 'user')
                 <a href="{{ route('userThreads') }}" class="mx-3">
-                    {{ __('app.my_threads') }}
+                    @lang('messages.my_threads')
                 </a>
                 <a href="{{ route('createThread') }}" class="mx-3">
-                    {{ __('app.create_thread') }}
+                    @lang('messages.create_thread')
                 </a>
-                <a href='{{ route('profile') }}' class="mx-3">{{ __('app.profile') }}</a>
+                <a href='{{ route('profile') }}' class="mx-3">@lang('messages.profile')</a>
             @endif
 
             @if (auth()->user()->role === 'admin')
-                <a href='{{ route('manageThread') }}' class="mx-3">{{ __('app.manage_threads') }}</a>
-                <a href='{{ route('onHoldThreads') }}' class="mx-3">{{ __('app.on_hold_threads') }}</a>
+                <a href='{{ route('manageThread') }}' class="mx-3">@lang('messages.manage_threads')</a>
+                <a href='{{ route('onHoldThreads') }}' class="mx-3">@lang('messages.on_hold_threads')</a>
             @endif
         @endauth
     </div>
@@ -39,14 +39,14 @@
         </div>
 
         @guest
-            <a href="{{ route('register') }}" class="mx-2">{{ __('app.register') }}</a>
-            <a href="{{ route('login') }}" class="mx-2">{{ __('app.login') }}</a>
+            <a href="{{ route('register') }}" class="mx-2">@lang('messages.register')</a>
+            <a href="{{ route('login') }}" class="mx-2">@lang('messages.login')</a>
         @else
             <span class="mx-3 fw-bold">{{ Auth::user()->name }}</span>
 
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button class="btn btn-outline-danger btn-sm">{{ __('app.logout') }}</button>
+                <button class="btn btn-outline-danger btn-sm">@lang('messages.logout')</button>
             </form>
         @endguest
     </div>
