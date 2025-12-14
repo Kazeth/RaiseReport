@@ -10,33 +10,43 @@
 
     {{-- Menu --}}
     <div class="col-6 d-flex align-items-center">
-        <a href="{{ route('threads') }}" class="mx-3">Threads</a>
+        <a href="{{ route('threads') }}" class="mx-3">{{ __('app.threads') }}</a>
 
         @auth
             @if (auth()->user()->role === 'user')
-                <a href='{{ route('userThreads') }}' class="mx-3">My Threads</a>
-                <a href='{{ route('createThread') }}' class="mx-3">Create Thread</a>
-                <a href='{{ route('profile') }}' class="mx-3">Profile</a>
+                <a href="{{ route('userThreads') }}" class="mx-3">
+                    {{ __('app.my_threads') }}
+                </a>
+                <a href="{{ route('createThread') }}" class="mx-3">
+                    {{ __('app.create_thread') }}
+                </a>
+                <a href='{{ route('profile') }}' class="mx-3">{{ __('app.profile') }}</a>
             @endif
 
             @if (auth()->user()->role === 'admin')
-                <a href='{{ route('manageThread') }}' class="mx-3">Manage Threads</a>
-                <a href='{{ route('onHoldThreads') }}' class="mx-3">On-Hold Threads</a>
+                <a href='{{ route('manageThread') }}' class="mx-3">{{ __('app.manage_threads') }}</a>
+                <a href='{{ route('onHoldThreads') }}' class="mx-3">{{ __('app.on_hold_threads') }}</a>
             @endif
         @endauth
     </div>
 
     {{-- Auth --}}
     <div class="col-4 d-flex justify-content-end align-items-center">
+        {{-- Language Switch --}}
+        <div class="mx-3">
+            <a href="{{ route('lang.switch', 'id') }}" class="mx-1">ID</a> |
+            <a href="{{ route('lang.switch', 'en') }}" class="mx-1">EN</a>
+        </div>
+
         @guest
-            <a href="{{ route('register') }}" class="mx-2">Register</a>
-            <a href="{{ route('login') }}" class="mx-2">Login</a>
+            <a href="{{ route('register') }}" class="mx-2">{{ __('app.register') }}</a>
+            <a href="{{ route('login') }}" class="mx-2">{{ __('app.login') }}</a>
         @else
             <span class="mx-3 fw-bold">{{ Auth::user()->name }}</span>
 
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button class="btn btn-outline-danger btn-sm">Logout</button>
+                <button class="btn btn-outline-danger btn-sm">{{ __('app.logout') }}</button>
             </form>
         @endguest
     </div>
