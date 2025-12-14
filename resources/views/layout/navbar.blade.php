@@ -38,16 +38,15 @@
         @endphp
 
         <div class="mx-3">
-            <a href="{{ route('lang.switch', 'id') }}"
-                class="mx-1 {{ $currentLocale === 'id' ? 'fw-bold text-primary' : '' }}">
+            <a href="{{ route('lang.switch', 'id') }}" class="mx-1 {{ $currentLocale !== 'id' ? 'text-muted' : '' }}">
                 ID
             </a>
             |
-            <a href="{{ route('lang.switch', 'en') }}"
-                class="mx-1 {{ $currentLocale === 'en' ? 'fw-bold text-primary' : '' }}">
+            <a href="{{ route('lang.switch', 'en') }}" class="mx-1 {{ $currentLocale !== 'en' ? 'text-muted' : '' }}">
                 EN
             </a>
         </div>
+
 
 
         @guest
