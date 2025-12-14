@@ -11,7 +11,7 @@
 
                     <div class="card shadow">
                         <div class="card-header text-center">
-                            <h4>Login</h4>
+                            <h4>@lang('messages.login')</h4>
                         </div>
 
                         <div class="card-body">
@@ -25,7 +25,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label>Password</label>
+                                    <label>@lang('messages.password')</label>
                                     <input type="password" name="password" class="form-control" required>
                                 </div>
 
@@ -39,10 +39,10 @@
                                     </div>
                                 @endif
 
-                                <button class="btn btn-primary w-100">Login</button>
+                                <button class="btn btn-primary w-100">@lang('messages.login')</button>
 
                                 <div class="text-center mt-3">
-                                    <a href="{{ route('register') }}">Don’t have an account? Register</a>
+                                    <a href="{{ route('register') }}">@lang('messages.register_suggestion')</a>
                                 </div>
 
                             </form>

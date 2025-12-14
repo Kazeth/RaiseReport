@@ -11,7 +11,7 @@
 
                     <div class="card shadow">
                         <div class="card-header text-center">
-                            <h4>Create Account</h4>
+                            <h4>@lang('messages.create_account')</h4>
                         </div>
 
                         <div class="card-body">
@@ -19,7 +19,7 @@
                                 @csrf
 
                                 <div class="mb-3">
-                                    <label>Name</label>
+                                    <label>@lang('messages.name')</label>
                                     <input type="text" name="name" class="form-control" value="{{ old('name') }}"
                                         required>
 
@@ -39,7 +39,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label>Password</label>
+                                    <label>@lang('messages.password')</label>
                                     <input type="password" name="password" class="form-control" required>
 
                                     @error('password')
@@ -48,15 +48,15 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label>Confirm Password</label>
+                                    <label>@lang('messages.confirm_password')</label>
                                     <input type="password" name="password_confirmation" class="form-control" required>
                                 </div>
 
 
-                                <button class="btn btn-primary w-100">Register</button>
+                                <button class="btn btn-primary w-100">@lang('messages.register')</button>
 
                                 <div class="text-center mt-3">
-                                    <a href="{{ route('login') }}">Already have an account? Login</a>
+                                    <a href="{{ route('login') }}">@lang('messages.login_suggestion')</a>
                                 </div>
 
                             </form>

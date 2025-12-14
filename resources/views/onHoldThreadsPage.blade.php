@@ -7,9 +7,9 @@
     <body>
         <div class="col d-flex justify-content-center">
             <div class="row container-sm justify-content-center" style="width: 50vw;">
-                <h1 class="d-flex justify-content-center">On-Hold Threads</h1>
+                <h1 class="d-flex justify-content-center">@lang('messages.on_hold_threads')</h1>
 
-                <input type="text" id="searchBox" class="form-control" placeholder="Search threads...">
+                <input type="text" id="searchBox" class="form-control" placeholder="@lang('messages.search_threads')">
                 <div id="threadContainer">
                     @foreach ($threads as $thread)
                         <a href="{{ route('detail', $thread->id) }}?from={{ url()->current() }}" style="text-decoration:none; color:inherit;">
@@ -28,18 +28,18 @@
                                 {{-- Info Section --}}
                                 <div class="d-flex justify-content-between mb-2">
                                     <div>Upvote : {{ $thread->upvotes_count }}</div>
-                                    <div>Posted on {{ $thread->created_at_formatted }}</div>
+                                    <div>@lang('messages.posted_on'){{ $thread->created_at_formatted }}</div>
                                 </div>
                                 <div class="d-flex">
                                     <form action="{{ route('approve', $thread->id) }}" method="POST" class="m-2"
                                         style="max-width: 120px;">
                                         @csrf
-                                        <button class="btn btn-success w-100">Approve</button>
+                                        <button class="btn btn-success w-100">@lang('messages.approve')</button>
                                     </form>
                                     <form action="{{ route('reject', $thread->id) }}" method="POST" class="m-2"
                                         style="max-width: 120px;">
                                         @csrf
-                                        <button class="btn btn-danger w-100">Reject</button>
+                                        <button class="btn btn-danger w-100">@lang('messages.reject')</button>
                                     </form>
                                 </div>
                             </div>

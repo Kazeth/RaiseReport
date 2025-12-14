@@ -7,17 +7,17 @@
     <body>
         <div class="col d-flex justify-content-center">
             <div class="row container-sm justify-content-center" style="width: 50vw;">
-                <h1 class="d-flex justify-content-center">Manage Threads</h1>
+                <h1 class="d-flex justify-content-center">@lang('messages.manage_threads')</h1>
 
                 <div class="d-flex mt-5 p-0" id="statusTabs">
 
                     <div class="col m-0 text-center py-2 approved-tab active"
                         style="background-color: transparent; color: #6c757d; cursor: pointer;">
-                        Approved
+                        @lang('messages.approved')
                     </div>
                     <div class="col text-center py-2 rejected-tab"
                         style="background-color: transparent; color: #6c757d; cursor: pointer;">
-                        Rejected
+                        @lang('messages.rejected')
                     </div>
                 </div>
 
@@ -53,7 +53,7 @@
 
                                         </div>
                                     @endif
-                                    <div>Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
+                                    <div>@lang('messages.posted_on'){{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
 
                                 </div>
                                 @if ($thread->threadStatus === 'Approved')
@@ -62,7 +62,7 @@
                                             style="">
                                             @csrf
                                             <button class="btn btn-warning"
-                                                style="border:2px solid rgb(255, 255, 255);">Revert to Pending</button>
+                                                style="border:2px solid rgb(255, 255, 255);">@lang('messages.pending_revert')</button>
                                         </form>
                                     </div>
                                 @endif

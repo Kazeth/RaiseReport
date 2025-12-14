@@ -6,7 +6,7 @@
 
     <body>
         <div class="container mt-4">
-            <h1 class="mb-4">Profile Page</h1>
+            <h1 class="mb-4">@lang('messages.profile_page')</h1>
 
             <!-- Alerts -->
             @if (session('success'))
@@ -31,7 +31,7 @@
 
                     <!-- Edit Name -->
                     <div class="mb-3">
-                        <label class="form-label">Nama</label>
+                        <label class="form-label">@lang('messages.name')</label>
                         <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                             value="{{ auth()->user()->name }}" required>
                         @error('name')
@@ -40,7 +40,7 @@
                     </div>
 
                     <!-- Submit -->
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                    <button type="submit" class="btn btn-primary">@lang('messages.update_profile')</button>
                 </form>
             </div>
         </div>

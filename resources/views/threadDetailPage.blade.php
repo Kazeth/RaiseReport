@@ -10,19 +10,19 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <!-- Back Button -->
                 <a href="{{ request('from') ?? route('threads') }}" class="btn btn-secondary">
-                    ← Back
+                    ← @lang('messages.back')
                 </a>
 
                 <div class="d-flex gap-2">
                     @if (auth()->check() && auth()->id() === $thread->userId)
                         <a href="{{ route('editThread', $thread->id) }}" class="btn btn-warning">
-                            ✏ Edit Thread
+                            ✏ @lang('messages.edit_thread')
                         </a>
                     @endif
 
                     @if (auth()->check() && (auth()->id() === $thread->userId || auth()->user()->role === 'admin'))
                         <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteThreadModal">
-                            🗑 Delete
+                            🗑 @lang('messages.delete')
                         </button>
                     @endif
 
@@ -50,9 +50,9 @@
                         <span class="info-dot custom-tip">
                             i
                             <span class="custom-tooltip">
-                                This thread is currently under review.<br>
-                                It may have been pulled back by an admin,<br>
-                                even if it was previously approved.
+                                @lang('messages.pending_message1')<br>
+                                @lang('messages.pending_message2')<br>
+                                @lang('messages.pending_message3')
                             </span>
                         </span>
                     @endif
@@ -62,8 +62,8 @@
                         <span class="info-dot custom-tip">
                             i
                             <span class="custom-tooltip">
-                                This thread was rejected.<br>
-                                Editing will resubmit it for review.
+                                @lang('messages.rejected_message1')<br>
+                                @lang('messages.rejected_message2')
                             </span>
                         </span>
                     @endif
@@ -72,7 +72,7 @@
 
 
                 <p class="text-muted">
-                    Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}
+                    @lang('messages.posted_on'){{ $thread->created_at->translatedFormat('d F Y - H.i') }}
                 </p>
 
                 <hr>
@@ -98,7 +98,7 @@
 
                 {{-- FILE ATTACHMENTS --}}
                 @if ($thread->files && $thread->files->count() > 0)
-                    <h4 class="mt-4">Attachments</h4>
+                    <h4 class="mt-4">@lang('messages.attachments')</h4>
 
                     <div class="list-group mt-2">
                         @foreach ($thread->files as $file)
@@ -152,19 +152,19 @@
                             <form action="{{ route('approve', $thread->id) }}" method="POST" class="m-2"
                                 style="max-width: 120px;">
                                 @csrf
-                                <button class="btn btn-success w-100">Approve</button>
+                                <button class="btn btn-success w-100">@lang('messages.approve')</button>
                             </form>
 
                             <form action="{{ route('reject', $thread->id) }}" method="POST" class="m-2"
                                 style="max-width: 120px;">
                                 @csrf
-                                <button class="btn btn-danger w-100">Reject</button>
+                                <button class="btn btn-danger w-100">@lang('messages.reject')</button>
                             </form>
                         </div>
                     @elseif ($thread->threadStatus === 'Approved')
                         <form action="{{ route('revert', $thread->id) }}" method="POST" class="m-2">
                             @csrf
-                            <button class="btn btn-warning">Revert to Pending</button>
+                            <button class="btn btn-warning">@lang('messages.pending_revert')</button>
                         </form>
                     @endif
 
@@ -177,12 +177,12 @@
                 <div class="modal-content">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">File Preview</h5>
+                        <h5 class="modal-title">@lang('messages.file_preview')</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body text-center" id="modalPreviewBody">
-                        <p class="text-muted">Loading preview...</p>
+                        <p class="text-muted">@lang('messages.loading_preview')</p>
                     </div>
 
                 </div>
@@ -347,27 +347,27 @@
                 <div class="modal-content">
 
                     <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title">⚠ Delete Thread</h5>
+                        <h5 class="modal-title">⚠ @lang('messages.delete_thread')</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
                         <p class="mb-2">
-                            Are you sure you want to delete this thread?
+                            @lang('messages.delete_warning1')
                         </p>
                         <p class="text-danger fw-bold mb-0">
-                            This action cannot be undon3e.
+                            @lang('messages.delete_warning2')
                         </p>
                     </div>
 
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">@lang('messages.cancel')</button>
 
                         <form id="deleteThreadForm" action="{{ route('thread.delete', $thread->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-danger">
-                                Yes, Delete
+                                @lang('messages.delete_confirm1')
                             </button>
                         </form>
                     </div>

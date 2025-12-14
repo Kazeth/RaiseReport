@@ -6,25 +6,25 @@
 
     <body>
         <div class="container mt-4" style="max-width: 700px;">
-            <h2>Edit Thread</h2>
+            <h2>@lang('messages.edit_thread')</h2>
 
             <form id="editThreadForm" action="{{ route('thread.update', $thread->id) }}" method="POST"
                 enctype="multipart/form-data">
                 @csrf
 
-                <label class="mt-3">Thread Name</label>
+                <label class="mt-3">@lang('messages.thread_name')</label>
                 <input type="text" name="threadName" class="form-control"
                     value="{{ old('threadName', $thread->threadName) }}" required>
 
-                <label class="mt-3">Thread Content</label>
+                <label class="mt-3">@lang('messages.thread_content')</label>
                 <textarea name="threadContent" class="form-control" rows="5" required>{{ old('threadContent', $thread->threadContent) }}</textarea>
 
-                <label class="mt-3">Add More Attachments</label>
+                <label class="mt-3">@lang('messages.add_attachments')</label>
                 <input type="file" name="files[]" class="form-control" multiple>
 
                 {{-- Existing attachments --}}
                 @if ($thread->files->count() > 0)
-                    <h5 class="mt-4">Current Attachments</h5>
+                    <h5 class="mt-4">@lang('messages.current_attachments')</h5>
                     <ul class="list-group">
                         @foreach ($thread->files as $file)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -35,7 +35,7 @@
                                         value="{{ $file->id }}" id="removeFile{{ $file->id }}">
 
                                     <label for="removeFile{{ $file->id }}" class="form-check-label text-danger">
-                                        Remove
+                                        @lang('messages.remove')
                                     </label>
                                 </div>
                             </li>
@@ -44,7 +44,7 @@
                 @endif
 
 
-                <button type="button" id="saveBtn" class="btn btn-primary mt-3 w-100">Save Changes</button>
+                <button type="button" id="saveBtn" class="btn btn-primary mt-3 w-100">@lang('messages.save_changes')</button>
             </form>
         </div>
 
@@ -54,22 +54,21 @@
                 <div class="modal-content">
 
                     <div class="modal-header">
-                        <h5 class="modal-title text-danger">⚠ Warning</h5>
+                        <h5 class="modal-title text-danger">⚠ @lang('messages.warning')</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
                         <p>
-                            Once you update this thread, it must be reviewed again by an admin.
-                            Its status will change back to <strong>Pending</strong> until approval.
+                            @lang('messages.edit_warning1') <strong>@lang('messages.pending')</strong>@lang('messages.edit_warning2')
                         </p>
 
-                        <p class="mb-0 fw-bold">Are you sure you want to proceed?</p>
+                        <p class="mb-0 fw-bold">@lang('messages.edit_warning3')</p>
                     </div>
 
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button id="confirmEditBtn" class="btn btn-danger">Yes, Continue</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">@lang('messages.cancel')</button>
+                        <button id="confirmEditBtn" class="btn btn-danger">@lang('messages.edit_confirm1')</button>
                     </div>
 
                 </div>

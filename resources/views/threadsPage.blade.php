@@ -7,9 +7,9 @@
     <body>
         <div class="col d-flex justify-content-center">
             <div class="row container-sm justify-content-center" style="width: 50vw;">
-                <h1 class="d-flex justify-content-center">Latest Threads</h1>
+                <h1 class="d-flex justify-content-center">@lang('messages.latest_threads')</h1>
 
-                <input type="text" id="searchBox" class="form-control" placeholder="Search threads...">
+                <input type="text" id="searchBox" class="form-control" placeholder="@lang('messages.search_threads')">
                 <div id="threadContainer">
                     @foreach ($threads as $thread)
                         <a href="{{ route('detail', $thread->id) }}?from={{ url()->current() }}" style="text-decoration:none; color:inherit;">
@@ -28,7 +28,7 @@
                                 {{-- Info Section --}}
                                 <div class="d-flex justify-content-between mb-2">
                                     <div>Upvote : {{ $thread->upvotes_count }}</div>
-                                    <div>Posted on {{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
+                                    <div>@lang('messages.posted_on'){{ $thread->created_at->translatedFormat('d F Y - H.i') }}</div>
                                 </div>
                                 {{-- guest --}}
                                 @guest
