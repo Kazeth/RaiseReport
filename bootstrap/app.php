@@ -21,10 +21,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'proxy' => TrustProxies::class,
             'locale' => SetLocale::class,
         ]);
-
-        $middleware->appendToGroup('web', [
-            SetLocale::class,
-        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
